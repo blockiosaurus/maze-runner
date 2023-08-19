@@ -15,7 +15,7 @@ export default class ControlsSprite extends Phaser.GameObjects.Image {
             .setAlpha(0.1)
             .setRotation(config.rotation)
             .setScrollFactor(0)
-            .setScale(0.75)
+            .setScale(1)
 
         this.type = config.type
 

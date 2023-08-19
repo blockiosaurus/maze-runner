@@ -2,6 +2,7 @@ const path = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
   entry: ['./src/scripts/game.ts', './webpack/credits.js'],
@@ -11,7 +12,12 @@ module.exports = {
     chunkFilename: '[name].chunk.js'
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js']
+    extensions: ['.ts', '.tsx', '.js'],
+    fallback: {
+      "fs": false,
+      "os": false,
+      "path": false,
+    }
   },
   module: {
     rules: [{ test: /\.tsx?$|\.jsx?$/, include: path.join(__dirname, '../src'), loader: 'ts-loader' }]
@@ -29,8 +35,9 @@ module.exports = {
     }
   },
   plugins: [
+    new Dotenv(),
     new NodePolyfillPlugin(),
-    new HtmlWebpackPlugin({ gameName: 'Yeast to West', template: 'src/index.html' }),
+    new HtmlWebpackPlugin({ gameName: 'Bread Maze', template: 'src/index.html' }),
     new CopyWebpackPlugin({
       patterns: [
         { from: 'src/assets', to: 'assets' },

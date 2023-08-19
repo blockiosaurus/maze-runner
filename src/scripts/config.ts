@@ -1,28 +1,28 @@
 import * as Phaser from 'phaser';
-import GameScene from './scenes/game';
-import LoginScene from './scenes/login';
+import Login from './scenes/login';
+import Chooser from './scenes/chooser';
+import Game from './scenes/game';
 
 type scaleMode = 'FIT' | 'SMOOTH'
 
-export const DEFAULT_WIDTH: number = 630
-export const DEFAULT_HEIGHT: number = 462
+export const DEFAULT_WIDTH: number = 576
+export const DEFAULT_HEIGHT: number = 576
 
 export const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
-    backgroundColor: '#FFFFFF',
     parent: 'phaser-game',
+    backgroundColor: '#000000',
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT,
+    scene: [Login, Chooser, Game],
     scale: {
-      // The game will be scaled manually in the resize()
-      mode: Phaser.Scale.FIT
+        mode: Phaser.Scale.FIT,
     },
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 1500 },
-            debug: false
+            debug: true
         },
     },
-    scene: [LoginScene, GameScene]
+    pixelArt: true,
 };

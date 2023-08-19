@@ -11,10 +11,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     SPEED = 200;
     JUMP_SPEED = 600;
     BOUNCE_SPEED = 200;
-    SCALE = 2;
+    SCALE = 1.5;
 
-    constructor(scene: Phaser.Scene, x: number, y: number) {
-        super(scene, x, y, 'player');
+    constructor(scene: Phaser.Scene, x: number, y: number, playerSprite: string) {
+        super(scene, x, y, playerSprite);
         scene.add.existing(this);
         scene.physics.add.existing(this);
         scene.physics.world.enable(this);
@@ -35,158 +35,118 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setScale(this.SCALE);
         // this.setOrigin(0, 1)
         // this.setDragX(1500)
-        // this.body.setSize(70, 132)
+        this.body.setSize(16, 24);
+        this.body.setOffset(8, 8);
         // this.body.setOffset(25, 24)
 
-        this.createAnimations(this.scene);
+        this.createAnimations(this.scene, playerSprite);
     }
 
     update(cursors: any, controls: Controls) {
-        if (this.isFrozen || !this.isAlive) return
+        // console.log(this);
+        // if (this.isFrozen || !this.isAlive) return
 
         // check if out of camera and kill
-        if (this.body.right < 0 || this.body.left > this.scene.cameras.main.getBounds().width || this.body.top > this.scene.cameras.main.getBounds().height) {
-            this.die()
-        }
+        // if (this.body.right < 0 || this.body.left > this.scene.cameras.main.getBounds().width || this.body.top > this.scene.cameras.main.getBounds().height) {
+        //     console.log('dying');
+        //     this.die()
+        // }
 
         // controls left & right
         if (cursors.left.isDown || controls.leftIsDown) {
             this.moveLeft();
         } else if (cursors.right.isDown || controls.rightIsDown) {
             this.moveRight();
-        } else if (this.body.velocity.y > 0) {
-            this.anims.play("fall", true);
+        } else if (cursors.up.isDown || controls.upIsDown) {
+            this.moveUp();
+        } else if (cursors.down.isDown || controls.downIsDown) {
+            this.moveDown();
         } else {
             this.stand();
         }
-
-        // controls up
-        if ((cursors.up.isDown || cursors.space.isDown || controls.upIsDown) && this.body.blocked.down) {
-            this.jump();
-        }
-
-        // const falling = this.body.velocity.y > 0;
-        // if (falling) {
-        //     this.anims.play("fall", true);
-        // }
     }
 
     moveLeft(): void {
         if (this.isFrozen) return;
 
-        this.body?.setVelocityX(-this.SPEED); // move left
+        this.body?.setVelocityX(-this.SPEED);
+        this.body?.setVelocityY(0);
 
-        const isRunning = this.body?.velocity.x !== 0/* && this.body?.velocity.y === 0*/;
-
-        if (isRunning) {
-            this.anims.play("run", true);
-        }
-
-        this.flipX = true; // flip the sprite to the left
+        this.anims.play("left", true);
     }
 
     moveRight(): void {
         if (this.isFrozen) return;
 
-        this.body?.setVelocityX(this.SPEED); // move right
+        this.body?.setVelocityX(this.SPEED);
+        this.body?.setVelocityY(0);
 
-        const isRunning = this.body?.velocity.x !== 0/* && this.body?.velocity.y === 0*/;
+        this.anims.play("right", true);
+    }
 
-        if (isRunning) {
-            this.anims.play("run", true);
-        }
+    moveUp(): void {
+        if (this.isFrozen) return;
 
-        this.flipX = false; // use the original sprite looking to the right
+        this.body?.setVelocityX(0);
+        this.body?.setVelocityY(-this.SPEED);
+
+        this.anims.play("up", true);
+    }
+
+    moveDown(): void {
+        if (this.isFrozen) return;
+
+        this.body?.setVelocityX(0);
+        this.body?.setVelocityY(this.SPEED);
+
+        this.anims.play("down", true);
     }
 
     stand(): void {
         this.body?.setVelocityX(0);
+        this.body?.setVelocityY(0);
 
-        const isStanding =
-            this.body?.velocity.x === 0 &&
-            this.body?.velocity.y === 0 &&
-            this.body?.blocked.down;
-
-        if (isStanding) {
-            this.anims.play("stop", true);
-        }
-    }
-
-    jump() {
-        const canJump = this.body?.blocked.down && this.isAlive && !this.isFrozen;
-
-        if (canJump) {
-            this.body?.setVelocityY(-this.JUMP_SPEED);
-            this.anims.play("jump", true);
-            // this.scene.sfx.jump.play();
-        }
-
-        return canJump;
-    }
-
-    bounce() {
-        this.body?.setVelocityY(-this.BOUNCE_SPEED);
-    }
-
-    freeze() {
-        if (this.body) {
-            this.body.enable = false;
-        }
         this.anims.play("stop", true);
-        this.isFrozen = true;
     }
 
-    die() {
-        this.isAlive = false;
-        if (this.body) {
-            this.body.enable = false;
-        }
-
-        // this.anims.play("die");
-        this.destroy();
-    }
-
-    makeInvincible() {
-        this.invincible = true;
-        this.invincibleTimer = this.scene.time.addEvent({
-            delay: 1000,
-            callback: () => {
-                this.invincible = false;
-            }
-        });
-    }
-
-    isInvincible() {
-        return this.invincible;
-    }
-
-    private createAnimations(scene: Phaser.Scene) {
+    private createAnimations(scene: Phaser.Scene, playerSprite: string) {
         scene.anims.create({
             key: "stop",
-            frames: scene.anims.generateFrameNumbers("player", {
+            frames: scene.anims.generateFrameNumbers(playerSprite, {
                 frames: [0]
             })
         });
         scene.anims.create({
-            key: "run",
-            frames: scene.anims.generateFrameNumbers("player", {
+            key: "right",
+            frames: scene.anims.generateFrameNumbers(playerSprite, {
                 frames: [3, 4, 5]
             }),
             frameRate: 8,
             repeat: -1
         });
         scene.anims.create({
-            key: "jump",
-            frames: scene.anims.generateFrameNumbers("player", {
-                frames: [1]
-            })
+            key: "left",
+            frames: scene.anims.generateFrameNumbers(playerSprite, {
+                frames: [6, 7, 8]
+            }),
+            frameRate: 8,
+            repeat: -1
         });
-
         scene.anims.create({
-            key: "fall",
-            frames: scene.anims.generateFrameNumbers("player", {
-                frames: [2]
-            })
+            key: "up",
+            frames: scene.anims.generateFrameNumbers(playerSprite, {
+                frames: [9, 10, 11]
+            }),
+            frameRate: 8,
+            repeat: -1
+        });
+        scene.anims.create({
+            key: "down",
+            frames: scene.anims.generateFrameNumbers(playerSprite, {
+                frames: [0, 1, 2]
+            }),
+            frameRate: 8,
+            repeat: -1
         });
     }
 }

@@ -1,127 +1,103 @@
 import * as Phaser from 'phaser';
-import { Web3Auth } from '@web3auth/modal';
-import { SolflareAdapter } from '@web3auth/solflare-adapter';
+import { getWallets, Wallet } from '@wallet-standard/core';
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
+import { BackpackWalletAdapter } from '@solana/wallet-adapter-backpack';
+import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 
-declare global {
-    interface Window {
-        Modal: any;
-        SolanaWalletConnectorPlugin: any;
-        SolflareAdapter: any;
-        rpc: any;
-    }
-}
-
-export default class LoginScene extends Phaser.Scene {
-    _connected: boolean = false;
-    startButton: Phaser.GameObjects.Text;
-    loginButton: Phaser.GameObjects.Text;
-    logoutButton: Phaser.GameObjects.Text;
-    web3auth: Web3Auth;
-
+export default class Login extends Phaser.Scene {
+    wallets: Wallet[] = [];
     constructor() {
-        super('login');
+        super('Bread Maze Login');
     }
 
     preload() {
+        this.load.image('Phantom', 'assets/phantom.jpg');
+        this.load.image('Solflare', 'assets/solflare.jpg');
+        this.load.image('Backpack', 'assets/backpack.jpg');
+        this.load.image('BagelTiles', 'assets/BagelTiles.png');
+        this.load.image('CrossedTiles', 'assets/CrossedTiles.png');
+        this.load.image('FocacciaTiles', 'assets/FocacciaTiles.png');
+        this.load.image('SourdoughTiles', 'assets/SourdoughTiles.png');
+        this.load.image('controls', 'assets/Controls.png')
+        this.load.spritesheet('BreadPlayer', 'assets/Bread.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('CaptainGrainbeardPlayer', 'assets/CaptainGrainbeard.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('ElPanDegenerarPlayer', 'assets/ElPanDegenerar.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('NootPlayer', 'assets/Noot.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('MonkePlayer', 'assets/Monke.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('RejectPlayer', 'assets/Reject.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('ChickenPlayer', 'assets/Chicken.png', { frameWidth: 32, frameHeight: 32 });
+        // const { get: getAllWallets, on: onWallets } = getWallets();
+        // console.log(getAllWallets());
+        // console.log(getAllWallets()[0].features['standard:connect']['connect']());
+        // getAllWallets().forEach((wallet: Wallet) => {
+        //     this.textures.addBase64(wallet.name, wallet.icon);
+        //     this.wallets.push(wallet);
+        // });
     }
 
     create() {
-        this.startButton = this.add.text(
-            this.cameras.main.centerX,
-            this.cameras.main.centerY - 50,
-            'Play',
-            {
-                fontSize: '32px',
-            })
-            .setOrigin(0.5)
-            .setPadding(10)
-            .setStyle({ backgroundColor: '#111' })
-            .setInteractive({ useHandCursor: true })
-            .on(Phaser.Input.Events.POINTER_DOWN, async () => {
-                this.startGame();
-            })
-            .on(Phaser.Input.Events.POINTER_OVER, () => this.startButton.setStyle({ fill: '#f39c12' }))
-            .on(Phaser.Input.Events.POINTER_OUT, () => this.startButton.setStyle({ fill: '#FFF' }))
-            .setVisible(false);
+        const width = this.sys.canvas.width;
+        const height = this.sys.canvas.height;
+        // console.log(width, height);
+        this.add.text(width / 2, 32, 'Login:', { fontSize: '64px' }).setOrigin(0.5);
+        // this.wallets.forEach((wallet: Wallet, index: number) => {
+        //     let icon = this.add.image(width/2, 128 * (index+1), this.wallets[index].name).setDisplaySize(64, 64);
+        //     // console.log(icon);
+        //     icon.setInteractive();
+        //     icon.on('pointerdown', () => {
+        //         // @ts-ignore
+        //         console.log(wallet.features);
+        //         // @ts-ignore
+        //         wallet.features['standard:connect']['connect']().then((res: any) => {
+        //             // console.log(res);
+        //             console.log(wallet);
+        //             this.scene.start('Bread Maze Chooser', {
+        //                 wallet: wallet.accounts[0].address,
+        //                 // @ts-ignore
+        //                 sns: wallet.features["solana:signAndSendTransaction"]["signAndSendTransaction"]
+        //             });
+        //         })
+        //     })
+        // });
+        // this.scene.start('Bread Maze');
 
-        this.loginButton = this.add.text(
-            this.cameras.main.centerX,
-            this.cameras.main.centerY,
-            'Login',
-            {
-                fontSize: '32px',
-            })
-            .setOrigin(0.5)
-            .setPadding(10)
-            .setStyle({ backgroundColor: '#111' })
-            .setInteractive({ useHandCursor: true })
-            .on(Phaser.Input.Events.POINTER_DOWN, async () => {
-                await this.login();
-            })
-            .on(Phaser.Input.Events.POINTER_OVER, () => this.loginButton.setStyle({ fill: '#f39c12' }))
-            .on(Phaser.Input.Events.POINTER_OUT, () => this.loginButton.setStyle({ fill: '#FFF' }))
+        let phantomIcon = this.add.image(width / 3, 128, "Phantom")
+            .setDisplaySize(64, 64)
+            .setInteractive()
+            .on('pointerdown', () => {
+                let adapter = new PhantomWalletAdapter();
+                adapter.connect().then(() => {
+                    this.scene.start('Bread Maze Chooser', {
+                        wallet: adapter.publicKey,
+                        adapter: adapter
+                    });
+                });
+            });
 
-        this.logoutButton = this.add.text(
-            this.cameras.main.centerX,
-            this.cameras.main.centerY + 50,
-            'Logout',
-            {
-                fontSize: '32px',
-            })
-            .setOrigin(0.5)
-            .setPadding(10)
-            .setStyle({ backgroundColor: '#111' })
-            .setInteractive({ useHandCursor: true })
-            .on(Phaser.Input.Events.POINTER_DOWN, async () => {
-                await this.logout();
-            })
-            .on(Phaser.Input.Events.POINTER_OVER, () => this.logoutButton.setStyle({ fill: '#f39c12' }))
-            .on(Phaser.Input.Events.POINTER_OUT, () => this.logoutButton.setStyle({ fill: '#FFF' }))
-            .setVisible(false);
-    }
+        let solflareIcon = this.add.image(width / 2, 128, "Solflare")
+            .setDisplaySize(64, 64)
+            .setInteractive()
+            .on('pointerdown', () => {
+                let adapter = new SolflareWalletAdapter();
+                adapter.connect().then(() => {
+                    this.scene.start('Bread Maze Chooser', {
+                        wallet: adapter.publicKey,
+                        adapter: adapter
+                    });
+                });
+            });
 
-    async login() {
-        // Replace this with your client ID generated at https://dashboard.web3auth.io/.
-        const clientId =
-            "BKK83z_vYtZWdRWyoYbUK3wAAyZbkPlKG5tgQcGCFA6xPSg1VoAWOtYehhGa_TEd2NDLMsiADApHcncxAHfobVk";
-
-        this.web3auth = new Web3Auth({
-            clientId,
-            chainConfig: {
-                chainNamespace: "solana",
-                chainId: "0x1", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
-                rpcTarget: "https://solana-mainnet.rpc.extrnode.com", // This is the public RPC we have added, please pass on your own endpoint while creating an app
-            },
-            web3AuthNetwork: "testnet",
-        });
-
-        const solflareAdapter = new SolflareAdapter({
-            clientId,
-        });
-        this.web3auth.configureAdapter(solflareAdapter);
-
-        await this.web3auth.initModal();
-        const provider = await this.web3auth.connect();
-        console.log(provider);
-
-        this._connected = true;
-        this.loginButton.setVisible(false);
-        this.logoutButton.setVisible(true);
-        this.startButton.setVisible(true);
-    }
-
-    async logout() {
-        await this.web3auth.logout();
-        this._connected = false;
-        this.loginButton.setVisible(true);
-        this.logoutButton.setVisible(false);
-        this.startButton.setVisible(false);
-    }
-
-    startGame() {
-        if (!this.sys.game.device.os.desktop) {
-            this.scale.startFullscreen();
-        }
-        this.scene.start('game');
+        let backpackIcon = this.add.image(2 * width / 3, 128, "Backpack")
+            .setDisplaySize(64, 64)
+            .setInteractive()
+            .on('pointerdown', () => {
+                let adapter = new BackpackWalletAdapter();
+                adapter.connect().then(() => {
+                    this.scene.start('Bread Maze Chooser', {
+                        wallet: adapter.publicKey,
+                        adapter: adapter
+                    });
+                });
+            });
     }
 }
