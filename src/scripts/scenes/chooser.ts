@@ -54,6 +54,8 @@ export default class Chooser extends Phaser.Scene {
 
 async function nftFetch(wallet: string) {
     let url = process.env.SERVER_URL;
+    console.log(url);
+    console.log(`${url}nfts/${wallet}`);
     let response = await axios({
         // Endpoint to send files
         url: `${url}nfts/${wallet}`,
