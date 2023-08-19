@@ -85,7 +85,7 @@ async function claimProof(connection: Connection, authority: Keypair, leaf_id: s
 export async function sendTransaction(adapter: BaseMessageSignerWalletAdapter, path: number[], leaf_id: string, wallet: string) {
     
     // console.log(result.tx);
-    const connection = new Connection(process.env.RPC_URL!, 'confirmed');
+    const connection = new Connection("https://solana-mainnet.rpc.extrnode.com", 'confirmed');
     // const secret = JSON.parse(process.env.AUTH_KEY!);
     // const secretKey = Uint8Array.from(secret);
     // const authority = Keypair.fromSecretKey(secretKey);
@@ -142,7 +142,7 @@ async function proofFetch(path: number[], leaf_id: string, wallet: string) {
     // let hash = "";
     // proof?.forEach((byte) => { hash = hash + byte.toString(16) });
     console.log(process.env);
-    let url = process.env.SERVER_URL;
+    let url = "https://bread-maze-15a908bc4a02.herokuapp.com/";
     // console.log(path);
     let pathBytes = Buffer.from(new Uint8Array(path)).toString('base64');
     // console.log(`${url}proof/${pathBytes}/${leaf_id}/${wallet}`);

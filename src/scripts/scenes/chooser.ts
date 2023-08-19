@@ -53,7 +53,7 @@ export default class Chooser extends Phaser.Scene {
 }
 
 async function nftFetch(wallet: string) {
-    let url = process.env.SERVER_URL;
+    let url = "https://bread-maze-15a908bc4a02.herokuapp.com/";
     console.log(url);
     console.log(`${url}nfts/${wallet}`);
     let response = await axios({
