@@ -141,6 +141,7 @@ async function proofFetch(path: number[], leaf_id: string, wallet: string) {
     let proof = hashPath(path);
     // let hash = "";
     // proof?.forEach((byte) => { hash = hash + byte.toString(16) });
+    console.log(process.env);
     let url = process.env.SERVER_URL;
     // console.log(path);
     let pathBytes = Buffer.from(new Uint8Array(path)).toString('base64');
