@@ -17,7 +17,7 @@ export default class Chooser extends Phaser.Scene {
                 if (nfts === null) {
                     this.add.text(32, 32, 'No Bread Mazes found', { fontSize: '64px', wordWrap: { width: 576 }, align: 'center' });
                 } else {
-                    console.log("Fetched: ", nfts);
+                    // console.log("Fetched: ", nfts);
                     let xOff = 64;
                     let yOff = 64;
                     for (const nft of nfts) {
