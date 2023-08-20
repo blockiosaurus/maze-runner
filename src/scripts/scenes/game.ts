@@ -96,12 +96,12 @@ export default class Game extends Phaser.Scene {
         if (this.path.length === 0 || this.path[this.path.length - 1].x !== playerPosition.x || this.path[this.path.length - 1].y !== playerPosition.y) {
             const index = contains(this.path, playerPosition);
             if (index !== -1) {
-                console.log("backtrack");
+                // console.log("backtrack");
                 this.path.splice(index + 1);
             } else {
                 this.path.push(playerPosition);
             }
-            console.log(this.path);
+            // console.log(this.path);
         }
 
         if (!this.won) {
