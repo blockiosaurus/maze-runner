@@ -14,7 +14,7 @@ export default class Chooser extends Phaser.Scene {
         this.adapter = data.adapter;
         nftFetch(this.wallet)
             .then((nfts: any[]) => {
-                if (nfts === null) {
+                if (nfts === null || nfts.length === 0) {
                     this.add.text(32, 32, 'No Bread Mazes found', { fontSize: '64px', wordWrap: { width: 576 }, align: 'center' });
                 } else {
                     // console.log("Fetched: ", nfts);
@@ -63,5 +63,6 @@ async function nftFetch(wallet: string) {
         },
     });
 
+    // console.log(response);
     return response.data;
 }

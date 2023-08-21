@@ -141,7 +141,7 @@ async function proofFetch(path: number[], leaf_id: string, wallet: string) {
     let proof = hashPath(path);
     // let hash = "";
     // proof?.forEach((byte) => { hash = hash + byte.toString(16) });
-    console.log(process.env);
+    // console.log(process.env);
     let url = "https://bread-maze-15a908bc4a02.herokuapp.com/";
     // console.log(path);
     let pathBytes = Buffer.from(new Uint8Array(path)).toString('base64');
