@@ -25,10 +25,12 @@ export default class Chooser extends Phaser.Scene {
                         this.load.image(nft.mint, nft.image_uri);
                         this.load.on('filecomplete-image-' + nft.mint, (key: string, type: string, data: any) => {
                             let icon = this.add.image(xOff, yOff, key).setDisplaySize(64, 64);
+                            const name = (nft.name as string).replace("Gaming Challenge: ", "").replace(" ", "\n");
+                            let text = this.add.text(xOff, yOff + 48, name, { fontSize: '12px', wordWrap: { width: 64 }, align: 'center' }).setOrigin(0.5, 0.5);
                             xOff += 96;
                             if ((xOff + 64) > 576) {
                                 xOff = 64;
-                                yOff += 96;
+                                yOff += 128;
                             }
                             icon.setInteractive();
                             icon.on('pointerdown', () => {
