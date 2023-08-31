@@ -25,6 +25,13 @@ export default class Chooser extends Phaser.Scene {
                         this.load.image(nft.mint, nft.image_uri);
                         this.load.on('filecomplete-image-' + nft.mint, (key: string, type: string, data: any) => {
                             let icon = this.add.image(xOff, yOff, key).setDisplaySize(64, 64);
+                            checkForProof(this.wallet, nft.mint).then((result) => {
+                                if (result) {
+                                    let effect = icon.postFX.addColorMatrix();
+                                    effect.grayscale();
+                                    // icon.setTint(0x00ff00);
+                                }
+                            });
                             const name = (nft.name as string).replace("Gaming Challenge: ", "").replace(" ", "\n");
                             let text = this.add.text(xOff, yOff + 48, name, { fontSize: '12px', wordWrap: { width: 64 }, align: 'center' }).setOrigin(0.5, 0.5);
                             xOff += 96;
@@ -67,4 +74,19 @@ async function nftFetch(wallet: string) {
 
     // console.log(response);
     return response.data;
+}
+
+async function checkForProof(wallet: string, leafId: string) {
+    // let url = "https://bread-maze-15a908bc4a02.herokuapp.com/";
+    let url = "http://localhost:5000/"
+    try {
+        let response = await axios({
+            // Endpoint to send files
+            url: `${url}check/${leafId}/${wallet}`,
+            method: "GET",
+        });
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
