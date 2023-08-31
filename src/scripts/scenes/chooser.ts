@@ -77,8 +77,8 @@ async function nftFetch(wallet: string) {
 }
 
 async function checkForProof(wallet: string, leafId: string) {
-    // let url = "https://bread-maze-15a908bc4a02.herokuapp.com/";
-    let url = "http://localhost:5000/"
+    let url = "https://bread-maze-15a908bc4a02.herokuapp.com/";
+    // let url = "http://localhost:5000/"
     try {
         let response = await axios({
             // Endpoint to send files
